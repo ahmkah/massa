@@ -871,7 +871,7 @@ async fn test_protocol_on_ask_operations() {
             .await
             {
                 None => panic!("Protocol did not send operations to pool."),
-                Some(ProtocolPoolEvent::GetOperations((_, operations_ids))) => {
+                Some(ProtocolPoolEvent::GetOperations(operations_ids)) => {
                     assert_eq!(operations_ids.len(), 1);
                     assert!(operations_ids.get(&expected_operation_id).is_some())
                 }
@@ -879,7 +879,11 @@ async fn test_protocol_on_ask_operations() {
             }
 
             protocol_command_sender
-                .send_get_operations_results(asker_node.id, vec![operation])
+                .send_get_operations_results(
+                    vec![(expected_operation_id, Some(operation))]
+                        .into_iter()
+                        .collect(),
+                )
                 .await
                 .unwrap();
 
